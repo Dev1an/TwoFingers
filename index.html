@@ -1,0 +1,117 @@
+<html>
+	<head>
+		<title>Dinge haha cool!</title>
+		<script>
+			const fingerIndicatorRadius = 40
+			const fingerIndicatorHeight = fingerIndicatorRadius*2
+			
+			const css = document.documentElement.style
+			
+			css.setProperty('--finger-height', fingerIndicatorHeight + 'px')
+			css.setProperty('--finger-radius', fingerIndicatorRadius + 'px')
+		</script>
+		<style>
+			.finger {
+				width: var(--finger-height);
+				height: var(--finger-height);
+				border-radius: var(--finger-radius);
+				position: absolute;
+			}
+			
+			:root {
+				--finger1: none;
+				--finger2: none;
+			}
+			.finger.one { background: #CFE5D0; display: var(--finger1)}
+			.finger.two { background: #BCC1E8; display: var(--finger2)}
+			
+			.finger.ref { border-radius: 2px; }
+			
+			section {
+				width: 100vw;
+				height: 100vh;
+			}
+			
+			html, body {
+				margin: 0;
+			}
+			
+			p { margin: 1em }
+		</style>
+		<script>
+			const section = document.createElement('section')
+			const finger1 = document.createElement('div')
+			const finger2    = finger1.cloneNode()
+			const fingerRef1 = finger1.cloneNode()
+			const fingerRef2 = finger1.cloneNode()
+			const paragraph = document.createElement('p')
+
+			section.append(finger1)
+			section.append(finger2)
+			section.append(fingerRef1)
+			section.append(fingerRef2)
+			section.append(paragraph)
+			
+			finger1.className    = "finger one"
+			finger2.className    = "finger two"
+			fingerRef1.className = "finger ref one"
+			fingerRef2.className = "finger ref two"
+
+			section.addEventListener('touchstart', touchStart)
+			section.addEventListener('touchmove', touchMove)
+			section.addEventListener('touchend', touchEnd)
+			
+			paragraph.innerText = "Open this app on a device with a touchscreen, then place two fingers on the screen simultaneously and drag them around."
+			window.addEventListener('load', () => document.body.append(section))
+			
+			let finger1ID, finger2ID;
+			
+			function touchStart(event) {
+				const touch = event.changedTouches[0]
+				if (finger1ID === undefined) {
+					finger1ID = touch.identifier
+					setPosition(finger1, touch)
+					setPosition(fingerRef1, touch)
+					css.setProperty('--finger1', 'block')
+				} else {
+					finger2ID = touch.identifier
+					setPosition(finger2, touch)
+					setPosition(fingerRef2, touch)
+					css.setProperty('--finger2', 'block')
+				}
+			}
+			
+			function touchMove(event) {
+				event.preventDefault()
+				const touch1 = event.touches.identifiedTouch(finger1ID)
+				const touch2 = event.touches.identifiedTouch(finger2ID)
+				if (touch1) setPosition(finger1, touch1)
+				if (touch2) setPosition(finger2, touch2)
+			}
+			
+			function touchEnd(event) {
+				for (let index = 0; index < event.changedTouches.length; index++) {
+					const touchID = event.changedTouches.item(index).identifier
+					if (touchID == finger1ID) {
+						finger1ID = undefined
+						css.setProperty('--finger1', 'none')
+					} else if (touchID == finger2ID) {
+						finger2ID = undefined
+						css.setProperty('--finger2', 'none')
+					}
+				}
+			}
+									
+			function setPosition(element, touch) {
+				element.style.left = `${touch.clientX - fingerIndicatorRadius}px`
+				element.style.top  = `${touch.clientY - fingerIndicatorRadius}px`
+			}
+			
+			TouchList.prototype.identifiedTouch = function(identifier) {
+				for (let index = 0; index < this.length; index++) {
+					if (this.item(index).identifier == identifier) return this.item(index)
+				}
+			}
+		</script>
+	</head>	
+</html>
