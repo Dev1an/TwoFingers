@@ -73,7 +73,7 @@
 					setPosition(finger1, touch)
 					setPosition(fingerRef1, touch)
 					css.setProperty('--finger1', 'block')
-				} else {
+				} else if (finger2ID === undefined) {
 					finger2ID = touch.identifier
 					setPosition(finger2, touch)
 					setPosition(fingerRef2, touch)
